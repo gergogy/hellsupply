@@ -22,12 +22,16 @@ const _setAuthCookie = (token, res) => {
 
 router.post('/login', async ({ body, app: { locals } }, res) => {
   const result = { success: false, userData: null }
-  if (!body || !body.username || !body.password) {
+  if (!body || !body.email || !body.password) {
     _removeAuthCookie(res)
     return res.json(result)
   }
-  const user = await locals.users.findOne({ username: body.username })
+  const user = await locals.users.findOne({ email: body.email })
   if (!user) {
+    _removeAuthCookie(res)
+    return res.json(result)
+  }
+  if (!user.active) {
     _removeAuthCookie(res)
     return res.json(result)
   }
